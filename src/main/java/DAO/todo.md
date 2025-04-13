@@ -1,4 +1,4 @@
-You will need to design and create your own DAO classes from scratch. 
+/You will need to design and create your own DAO classes from scratch. 
 You should refer to prior mini-project lab examples and course material for guidance.
 
 Please refrain from using a 'try-with-resources' block when connecting to your database. 
