@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class accountDAO {
+public class AccountDAO {
 
     //verify user
     public Account verifyUser(String username, String password)
