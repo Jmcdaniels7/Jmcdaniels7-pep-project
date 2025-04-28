@@ -39,6 +39,11 @@ public class AccountService
         return accountDAO.verifyUser(account.username, account.password);
     }
 
+    public Account getAccountByID(Account account)
+    {
+        return accountDAO.getAccountByID(account.getAccount_id());
+    }
+
 
     
 }

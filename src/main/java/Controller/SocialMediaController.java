@@ -2,6 +2,9 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+
+import static org.mockito.ArgumentMatchers.nullable;
+
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +23,18 @@ import Service.MessageService;
 public class SocialMediaController {
     AccountService accountService;
     MessageService messageService;
+
+    public SocialMediaController()
+    {
+        accountService = new AccountService();
+        messageService = new MessageService();
+    }
+
+    public SocialMediaController(AccountService accountService, MessageService messageService)
+    {
+        this.accountService = accountService;
+        this.messageService = messageService;
+    }
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
      * suite must receive a Javalin object from this method.
@@ -27,14 +42,14 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.post("/accounts", this::postAccountHandler);
-        app.get("/accounts", this::verifyUserHandler);
+        app.post("/register", this::postAccountHandler);
+        app.get("/login", this::verifyUserHandler);
         app.post("/messages", this::postMessage);
-        app.get("/messages", this::getAllMessagesByUser);
+        app.get("messages/{posted_by}/messages", this::getAllMessagesByUser);
         app.get("/messages", this::getAllMessages);
-        app.post("/messages", this::deleteMessageHandler);
-        app.post("/messages", this::updateMessageHandler);
-        app.get("/messages", this::getMessagesByMessageID);
+        app.delete("/messages/{message_id}", this::deleteMessageHandler);
+        app.patch("/messages/{message_id}", this::updateMessageHandler);
+        app.get("/messages/{message_id}", this::getMessagesByMessageID);
 
 
 
@@ -46,13 +61,24 @@ public class SocialMediaController {
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
 
-    private void verifyUserHandler(Context ctx)
+    private void verifyUserHandler(Context ctx) throws JsonProcessingException
     {
-        /*Need to figure out how to make statements to read username and then another statement for password 
+        //Need to figure out how to make statements to read username and then another statement for password 
         ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(ctx.body());
-        Account verfiyAccount = accountService.verifyAccount(account);
-        */
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account verifyAccount = accountService.verifyAccount(account);
+
+        if(verifyAccount != null)
+        {
+            ctx.json(mapper.writeValueAsString(verifyAccount));
+            
+
+        }
+        else
+        {
+            ctx.status(401);
+        }
+        
         
     
 
@@ -73,8 +99,21 @@ public class SocialMediaController {
         }
     }
 
-    private void postMessage(Context ctx)
+    private void postMessage(Context ctx) throws JsonProcessingException
     {
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(ctx.body(), Message.class);
+        Message addedMessage = messageService.addMessage(message);
+
+        if(addedMessage != null)
+        {
+            ctx.json(mapper.writeValueAsString(addedMessage));
+            ctx.status(200);
+        }
+        else
+        {
+            ctx.status(400);
+        }
 
     }
 
@@ -87,14 +126,17 @@ public class SocialMediaController {
 
         System.out.println(userMessages);
 
-        if(userMessages == null)
+        if(userMessages != null)
         {
-            ctx.status(400);
+
+            ctx.json(mapper.writeValueAsString(userMessages));
+           
 
         }
         else
         {
-            ctx.json(mapper.writeValueAsString(userMessages));
+            ctx.result("");
+            
 
         }
 
@@ -116,14 +158,15 @@ public class SocialMediaController {
 
         System.out.println(deletedMessage);
 
-        if(deletedMessage == null)
-        {
-            ctx.status(400);
-        }
-        else
+        if(deletedMessage != null)
         {
             ctx.json(mapper.writeValueAsString(deletedMessage));
             messageService.deleteMessByID(message_id);
+            
+        }
+        else
+        {
+            ctx.result("");
         }
 
     }
@@ -143,6 +186,7 @@ public class SocialMediaController {
         else
         {
             ctx.json(mapper.writeValueAsString(updatedMessage));
+            ctx.status(200);
         }
 
 
@@ -158,7 +202,7 @@ public class SocialMediaController {
 
         if(messagesByMessID == null)
         {
-            ctx.status(400);
+            ctx.result("");
         }
         else
         {

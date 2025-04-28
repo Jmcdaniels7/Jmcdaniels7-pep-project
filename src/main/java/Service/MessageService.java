@@ -1,23 +1,31 @@
 package Service;
 
 import Model.Message;
+import Model.Account;
+
 import DAO.MessageDAO;
+import DAO.AccountDAO;
+
+import static org.mockito.ArgumentMatchers.nullable;
 
 import java.util.List;
 
 public class MessageService {
     MessageDAO messageDAO;
+    AccountDAO accountDAO;
 
 
     //constructors
     public MessageService()
     {
         messageDAO = new MessageDAO();
+        accountDAO = new AccountDAO();
     }
 
-    public MessageService(MessageDAO messageDAO)
+    public MessageService(MessageDAO messageDAO, AccountDAO accountDAO)
     {
         this.messageDAO = messageDAO;
+        this.accountDAO = accountDAO;
 
     }
 
@@ -25,6 +33,11 @@ public class MessageService {
 
     public Message addMessage(Message message)
     {
+        if(message.getMessage_text() == null || message.getMessage_text().isEmpty() || message.getMessage_text().length() > 255)
+        {
+            return null;
+        }
+
         return messageDAO.newMessage(message);
     }
 
@@ -54,18 +67,31 @@ public class MessageService {
 
     public Message updateMessages(int id, Message message)
     {
-        if(messageDAO.getMessageByID(id) == null)
+        if(messageDAO.getMessageByID(id) == null || message.getMessage_text().length() > 255 || message.getMessage_text() == null || message.getMessage_text().isEmpty())
         {
             return null;
         }
+        else
+        {
+            messageDAO.updateMessage(id, message);
 
-        messageDAO.updateMessage(id, message);
+            return messageDAO.getMessageByID(id);
 
-        return messageDAO.getMessageByID(id);
+        }
+
+        
     }
 
     public List<Message> getUserMessages(int user)
     {
+        Account getAccount = accountDAO.getAccountByID(user);
+
+        if(getAccount == null) 
+        {
+            return null;
+
+        }
+
         return messageDAO.getAllUserMessages(user);
     }
 

@@ -2,11 +2,8 @@ package DAO;
 
 import Util.ConnectionUtil;
 import Model.Message;
+import java.sql.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,16 +16,22 @@ public class MessageDAO {
         try
         {
             String sql = "insert into Message (posted_by, message_text, time_posted_epoch) values(?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setInt(1, message.getPosted_by());
             preparedStatement.setString(2, message.getMessage_text());
             preparedStatement.setLong(3, message.getTime_posted_epoch());
 
             preparedStatement.executeUpdate();
-            return message;
 
+            ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
 
+            if(pkeyResultSet.next()){
+                int generated_message_id = pkeyResultSet.getInt(1);
+                return new Message(generated_message_id, message.getPosted_by(), message.getMessage_text(), message.getTime_posted_epoch());
+            }
+
+            
         }
         catch(SQLException e)
         {
@@ -85,7 +88,7 @@ public class MessageDAO {
                 Message message = new Message(rs.getInt("message_id"),
                         rs.getInt("posted_by"),
                         rs.getString("message_text"),
-                        rs.getInt("time_posted_epoch"));
+                        rs.getLong("time_posted_epoch"));
                 return message;
             }
 
@@ -105,7 +108,7 @@ public class MessageDAO {
 
         try
         {
-            String sql = "delete from Message where message_id = ?";
+            String sql = "delete from message where message_id = ?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
@@ -129,13 +132,13 @@ public class MessageDAO {
 
         try
         {
-            String sql = "update Message set message_text = ?, time_posted_epoch = ? where message_id = ?";
+
+            String sql = "update Message set message_text = ? where message_id = ?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1, message.message_text);
-            preparedStatement.setLong(2, message.time_posted_epoch);
-            preparedStatement.setInt(3, message.getMessage_id());
+            preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
