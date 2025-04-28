@@ -13,6 +13,8 @@ import Model.Message;
 import Service.AccountService;
 import Service.MessageService;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
  * found in readme.md as well as the test cases. You should
@@ -43,7 +45,7 @@ public class SocialMediaController {
         app.post("/register", this::postAccountHandler);
         app.get("/login", this::verifyUserHandler);
         app.post("/messages", this::postMessage);
-        app.get("accounts/{account_id}/messages", this::getAllMessagesByUser);
+        app.get("messages/{posted_by}/messages", this::getAllMessagesByUser);
         app.get("/messages", this::getAllMessages);
         app.delete("/messages/{message_id}", this::deleteMessageHandler);
         app.patch("/messages/{message_id}", this::updateMessageHandler);
@@ -119,7 +121,7 @@ public class SocialMediaController {
     {
         ObjectMapper mapper = new ObjectMapper();
         
-        int userID = Integer.parseInt(ctx.pathParam("account_id"));
+        int userID = Integer.parseInt(ctx.pathParam("posted_by"));
         List<Message> userMessages = messageService.getUserMessages(userID);
 
         System.out.println(userMessages);
