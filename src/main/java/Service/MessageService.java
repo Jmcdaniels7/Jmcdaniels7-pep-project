@@ -6,8 +6,6 @@ import Model.Account;
 import DAO.MessageDAO;
 import DAO.AccountDAO;
 
-import static org.mockito.ArgumentMatchers.nullable;
-
 import java.util.List;
 
 public class MessageService {
@@ -86,7 +84,7 @@ public class MessageService {
     {
         Account getAccount = accountDAO.getAccountByID(user);
 
-        if(getAccount == null) 
+        if(getAccount == null || messageDAO.getAllUserMessages(user) == null || messageDAO.getAllUserMessages(user).isEmpty() ) 
         {
             return null;
 

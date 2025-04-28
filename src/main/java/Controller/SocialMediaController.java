@@ -3,8 +3,6 @@ package Controller;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-import static org.mockito.ArgumentMatchers.nullable;
-
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,7 +43,7 @@ public class SocialMediaController {
         app.post("/register", this::postAccountHandler);
         app.get("/login", this::verifyUserHandler);
         app.post("/messages", this::postMessage);
-        app.get("messages/{posted_by}/messages", this::getAllMessagesByUser);
+        app.get("accounts/{account_id}/messages", this::getAllMessagesByUser);
         app.get("/messages", this::getAllMessages);
         app.delete("/messages/{message_id}", this::deleteMessageHandler);
         app.patch("/messages/{message_id}", this::updateMessageHandler);
@@ -121,7 +119,7 @@ public class SocialMediaController {
     {
         ObjectMapper mapper = new ObjectMapper();
         
-        int userID = Integer.parseInt(ctx.pathParam("posted_by"));
+        int userID = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> userMessages = messageService.getUserMessages(userID);
 
         System.out.println(userMessages);
