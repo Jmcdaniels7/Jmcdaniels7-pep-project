@@ -41,12 +41,12 @@ public class SocialMediaController {
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
     public Javalin startAPI() {
-        
+
         Javalin app = Javalin.create();
         app.post("/register", this::postAccountHandler);
         app.get("/login", this::verifyUserHandler);
         app.post("/messages", this::postMessage);
-        app.get("messages/{posted_by}/messages", this::getAllMessagesByUser);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesByUser);
         app.get("/messages", this::getAllMessages);
         app.delete("/messages/{message_id}", this::deleteMessageHandler);
         app.patch("/messages/{message_id}", this::updateMessageHandler);
