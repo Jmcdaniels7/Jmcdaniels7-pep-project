@@ -119,7 +119,7 @@ public class SocialMediaController {
     {
         ObjectMapper mapper = new ObjectMapper();
         
-        int userID = Integer.parseInt(ctx.pathParam("posted_by"));
+        int userID = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> userMessages = messageService.getUserMessages(userID);
 
         System.out.println(userMessages);
