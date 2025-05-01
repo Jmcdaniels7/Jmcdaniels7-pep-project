@@ -3,10 +3,7 @@ package DAO;
 import Util.ConnectionUtil;
 import Model.Account;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class AccountDAO {
 
@@ -48,16 +45,25 @@ public class AccountDAO {
 
         try
         {
+            
             //sql query for inserting a new user
             String sql = "insert into Account (username, password) values(?, ?)";
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, account.getUsername());
             preparedStatement.setString(2, account.getPassword());
 
-            preparedStatement.executeUpdate();
-            return account;
+           preparedStatement.executeUpdate();
+
+            ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
+
+            while(pkeyResultSet.next()){
+                int generated_message_id = pkeyResultSet.getInt(1);
+                return new Account(generated_message_id,
+                account.getUsername(),
+                account.getPassword());
+            }
         }
         catch(SQLException e)
         {

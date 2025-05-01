@@ -83,14 +83,6 @@ public class MessageService {
 
     public List<Message> getUserMessages(int user)
     {
-        Account getAccount = accountDAO.getAccountByID(user);
-
-        if(getAccount == null || messageDAO.getAllUserMessages(user) == null || messageDAO.getAllUserMessages(user).isEmpty() ) 
-        {
-            return null;
-
-        }
-
         return messageDAO.getAllUserMessages(user);
     }
 

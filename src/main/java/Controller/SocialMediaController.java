@@ -44,7 +44,7 @@ public class SocialMediaController {
 
         Javalin app = Javalin.create();
         app.post("/register", this::postAccountHandler);
-        app.get("/login", this::verifyUserHandler);
+        app.post("/login", this::verifyUserHandler);
         app.post("/messages", this::postMessage);
         app.get("/accounts/{account_id}/messages", this::getAllMessagesByUser);
         app.get("/messages", this::getAllMessages);
@@ -76,9 +76,6 @@ public class SocialMediaController {
         {
             ctx.status(401);
         }
-        
-        
-    
 
     }
     private void postAccountHandler(Context ctx) throws JsonProcessingException 
@@ -122,21 +119,7 @@ public class SocialMediaController {
         int userID = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> userMessages = messageService.getUserMessages(userID);
 
-        System.out.println(userMessages);
-
-        if(userMessages != null)
-        {
-
-            ctx.json(mapper.writeValueAsString(userMessages));
-           
-
-        }
-        else
-        {
-            ctx.result("");
-            
-
-        }
+        ctx.json(mapper.writeValueAsString(userMessages));
 
     }
 

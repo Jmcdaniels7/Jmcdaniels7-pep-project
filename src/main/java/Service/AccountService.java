@@ -24,13 +24,13 @@ public class AccountService
     //methods
     public Account addAccount(Account account)
     {
-        if(account.username != null && account.password.length() > 4 && accountDAO.verifyUser(account.username,  account.password) == null)
+        if(account.username == null || account.username.isEmpty() || account.password.length() < 4 || accountDAO.verifyUser(account.username,  account.password) != null)
         {
-            return accountDAO.insertUser(account);
+            return null;
 
         }
 
-        return null;
+        return accountDAO.insertUser(account);
        
     }
 
